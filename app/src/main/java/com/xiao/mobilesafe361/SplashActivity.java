@@ -6,8 +6,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
@@ -19,10 +21,14 @@ import com.xiao.mobilesafe361.utils.PackageUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+
 
 public class SplashActivity extends AppCompatActivity {
-
+    //服务器更新页面地址
     private static final String CONNECTURL = "http://10.0.2.2:8080/update.html";
+    //新版APK下载地址
+    private static final String SAVE_URL = "mnt/sdcard/mobileSafe361_2.apk";
     private TextView mVersion;
     private int mNewCode;
     private String mNewApkurl;
@@ -102,12 +108,24 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     /**
-      * @Description:    更新程序，生成一个选择对话框
+      * @Description:    更新版本对话框，生成一个选择对话框
       * @Author:         TimXiao
       * @CreateDate:     2020/2/2 22:03
      */
     private void showUpdateDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        //设置对话框是否可以消失
+        //builder.setCancelable(false);
+        //监听对话框消失的操作
+        builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialogInterface) {
+                //隐藏对话框
+                dialogInterface.dismiss();
+                //对话框消失，跳转到首页
+                enterHome();
+            }
+        });
         //设置标题
         builder.setTitle("最新版本："+ mNewCode + ".0");
         //设置图标
@@ -119,23 +137,59 @@ public class SplashActivity extends AppCompatActivity {
 
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-
+                //隐藏对话框
+                dialogInterface.dismiss();
+                //下载最新的APK
+                downLoadAPK();
             }
         });
         builder.setNegativeButton("以后再说", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-
+                //隐藏对话框
+                dialogInterface.dismiss();
+                //对话框消失，跳转到首页
+                enterHome();
             }
         });
         //显示对话框
         builder.show();
     }
 
+    private void downLoadAPK() {
+        //问题：1. 下载路径；2. 写SD卡的权限；3. 判断SD卡是否挂载；4. 生成一个2.0版本的APK。
+        //判断SD卡是否挂载,如果有则开始下载动作，如果没有则吐司提示用户
+        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+            //链接服务器，下载最新版本
+            HttpUtils httpUtils = new HttpUtils();
+            //1. url下载路径
+            //2. 文件在手机中的保存路径
+            //3. 下载的回调方法
+            httpUtils.download(mNewApkurl, SAVE_URL, new RequestCallBack<File>() {
+                @Override
+                public void onSuccess(ResponseInfo<File> responseInfo) {
+
+                }
+
+                @Override
+                public void onFailure(HttpException e, String s) {
+
+                }
+            });
+        }else {
+            //吐司提醒用户没有SD卡
+            Toast.makeText(getApplicationContext(), "没有可用的SD卡", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
     private void enterHome() {
         //用显示意图打开首页activity
         Intent intent = new Intent(this, HomeActivity.class);
         startActivity(intent);
+
+        //防止按下返回键，跳回欢迎页面，需要在跳转首页后，移除欢迎页面
+        finish();
     }
 
     /**
