@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:xiao="http://schemas.android.com/apk/res/com.xiao.mobilesafe361"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".SettingActivity">
+<!-- xmlns:android="http://schemas.android.com/apk/res/android" : 命名空间，标示布局文件中使用的属性应该从哪里获取 -->
+<!--    style:引用样式-->
+    <TextView
+        style="@style/ActivityTitle"
+        android:text="设置中心"/>
+
+    <com.xiao.mobilesafe361.view.SettingView
+        android:id="@+id/setting_sv_update"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/selector_setting_item_top"
+        android:clickable="true"
+        xiao:title="设置自动更新"
+        android:layout_marginTop="12dp"
+        >
+    </com.xiao.mobilesafe361.view.SettingView>
+    <com.xiao.mobilesafe361.view.SettingView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/selector_setting_item_last"
+        android:clickable="true"
+        xiao:title="设置骚扰拦截">
+    </com.xiao.mobilesafe361.view.SettingView>
+
+    <com.xiao.mobilesafe361.view.SettingView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/selector_setting_item_top"
+        android:clickable="true"
+        android:layout_marginTop="12dp"
+        xiao:title="归属地显示设置">
+    </com.xiao.mobilesafe361.view.SettingView>
+
+    <com.xiao.mobilesafe361.view.SettingView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/selector_setting_item_last"
+        android:clickable="true"
+        xiao:title="归属地风格设置">
+    </com.xiao.mobilesafe361.view.SettingView>
+
+</LinearLayout>

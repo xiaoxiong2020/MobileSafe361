@@ -1,13 +1,18 @@
 package com.xiao.mobilesafe361;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.util.Log;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,14 +38,28 @@ public class SplashActivity extends AppCompatActivity {
     private int mNewCode;
     private String mNewApkurl;
     private String mNewMsg;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
+        //初始化界面
         initView();
-        update();
+        /*
+        * 延迟一段时间后，再进行更新操作
+        * postDelayed()
+        * 1. 接受消息执行的操作，即Runnable对象的run方法
+        * 2. 延迟的时间*/
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                //执行更新操作
+                update();
+            }
+        }, 2000);
+
     }
 
     private void update() {
@@ -113,6 +132,8 @@ public class SplashActivity extends AppCompatActivity {
       * @CreateDate:     2020/2/2 22:03
      */
     private void showUpdateDialog() {
+        //显示下载对话框
+        showProgressDialog();
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         //设置对话框是否可以消失
         //builder.setCancelable(false);
@@ -156,6 +177,22 @@ public class SplashActivity extends AppCompatActivity {
         builder.show();
     }
 
+    /**
+      * @Description:    显示下载进度条对话框
+      * @Author:         TimXiao
+      * @CreateDate:     2020/2/3 10:12
+     */
+
+    private void showProgressDialog() {
+        progressDialog = new ProgressDialog(this);
+        //设置进度条的样式
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        //设置对话框是否可以消失
+        progressDialog.setCancelable(false);
+        //显示对话框
+        progressDialog.show();
+    }
+
     private void downLoadAPK() {
         //问题：1. 下载路径；2. 写SD卡的权限；3. 判断SD卡是否挂载；4. 生成一个2.0版本的APK。
         //判断SD卡是否挂载,如果有则开始下载动作，如果没有则吐司提示用户
@@ -168,12 +205,35 @@ public class SplashActivity extends AppCompatActivity {
             httpUtils.download(mNewApkurl, SAVE_URL, new RequestCallBack<File>() {
                 @Override
                 public void onSuccess(ResponseInfo<File> responseInfo) {
+                    //下载成功，隐藏对话框
+                    progressDialog.dismiss();
+                    enterHome();
+                    //下载完成后，安装APK
+                    installAPK();
+                }
 
+                /**
+                  * @Description:    获取下载进度情况的方法
+                 * 目的设置下载进度条
+                 * 1. total: 下载总进度
+                 * 2. current：当前进度
+                 * 3. isUploading: 是否支持回调上传
+                  * @Author:         TimXiao
+                  * @CreateDate:     2020/2/3 10:08
+                 */
+                @Override
+                public void onLoading(long total, long current, boolean isUploading) {
+                    super.onLoading(total, current, isUploading);
+                    //设置总进度
+                    progressDialog.setMax((int) total);
+                    //设置当前进度
+                    progressDialog.setProgress((int) current);
                 }
 
                 @Override
                 public void onFailure(HttpException e, String s) {
-
+                    //下载失败，隐藏对话框
+                    progressDialog.dismiss();
                 }
             });
         }else {
@@ -181,6 +241,52 @@ public class SplashActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "没有可用的SD卡", Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+
+    
+    
+    /**
+      * @Author:         TimXiao
+      * @CreateDate:     2020/2/3 11:54
+      * @Description:    APK安装的方法
+     */
+    private void installAPK() {
+        /*
+        * <activity android:name=".PackageInstallerActivity"
+                android:configChanges="orientation|keyboardHidden"
+                android:theme="@style/TallTitleBarTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="content" /> //用内容提供者获取APK安装文件
+                <data android:scheme="file" />     //用文件获取APK
+                <data android:mimeType="application/vnd.android.package-archive" />
+            </intent-filter>
+        </activity>
+        用隐式意图打开PackageInstallerActivity
+        */
+        Intent intent = new Intent();
+        intent.setAction("android.intent.action.VIEW");
+        intent.addCategory("android.intent.category.DEFAULT");
+        //1. data数据,这里是uri路径，2. 数据的类型
+        intent.setDataAndType(Uri.fromFile(new File(SAVE_URL)), "application/vnd.android.package-archive");
+        //直接打开另一个activity
+        startActivity(intent);
+        //
+        // 当跳转到的activity退出时，会调用当前activity的onActivityResult()方法
+        //用这个逻辑实现，退出安装界面时返回首页而不是又返回欢迎页面
+        // 1. intent 意图。
+        // 2. requestCode请求码，被打开activity用该请求码来区分是哪个发起activity来打开自己的。
+        // 因为只有一个activity请求打开PackageInstallerActivity，所以就用0即可，不然可以定义一个常量。
+        startActivityForResult(intent, 0);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        //跳转首页
+        enterHome();
     }
 
     private void enterHome() {
