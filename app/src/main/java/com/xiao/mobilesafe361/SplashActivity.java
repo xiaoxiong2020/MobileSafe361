@@ -22,11 +22,14 @@ import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
 import com.xiao.mobilesafe361.utils.PackageUtil;
+import com.xiao.mobilesafe361.utils.SharedPreferencesUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+
+import static com.xiao.mobilesafe361.interfacre.Constants.ISPUDATE;
 
 
 public class SplashActivity extends AppCompatActivity {
@@ -56,7 +59,14 @@ public class SplashActivity extends AppCompatActivity {
             @Override
             public void run() {
                 //执行更新操作
-                update();
+                /*
+                * 检测设置中心的配置文件，根据是否需要更新来执行更新动作*/
+                boolean  isupdate = SharedPreferencesUtil.getBoolean(getApplicationContext(), ISPUDATE, true);
+                if (isupdate){
+                    update();
+                }else {
+                    enterHome();
+                }
             }
         }, 2000);
 
@@ -132,8 +142,7 @@ public class SplashActivity extends AppCompatActivity {
       * @CreateDate:     2020/2/2 22:03
      */
     private void showUpdateDialog() {
-        //显示下载对话框
-        showProgressDialog();
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         //设置对话框是否可以消失
         //builder.setCancelable(false);
@@ -197,6 +206,8 @@ public class SplashActivity extends AppCompatActivity {
         //问题：1. 下载路径；2. 写SD卡的权限；3. 判断SD卡是否挂载；4. 生成一个2.0版本的APK。
         //判断SD卡是否挂载,如果有则开始下载动作，如果没有则吐司提示用户
         if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+            //显示下载对话框
+            showProgressDialog();
             //链接服务器，下载最新版本
             HttpUtils httpUtils = new HttpUtils();
             //1. url下载路径
@@ -252,6 +263,7 @@ public class SplashActivity extends AppCompatActivity {
       * @Description:    APK安装的方法
      */
     private void installAPK() {
+
         /*
         * <activity android:name=".PackageInstallerActivity"
                 android:configChanges="orientation|keyboardHidden"

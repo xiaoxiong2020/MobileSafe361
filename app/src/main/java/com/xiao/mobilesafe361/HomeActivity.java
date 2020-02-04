@@ -1,18 +1,30 @@
 package com.xiao.mobilesafe361;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.FileUtils;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class HomeActivity extends AppCompatActivity {
+import com.xiao.mobilesafe361.interfacre.Constants;
+import com.xiao.mobilesafe361.utils.SharedPreferencesUtil;
+
+import static com.xiao.mobilesafe361.interfacre.Constants.SJFDPWD;
+
+public class HomeActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
     private final String[] TITLES = new String[] { "手机防盗", "骚扰拦截", "软件管家",
             "进程管理", "流量统计", "手机杀毒", "缓存清理", "常用工具" };
@@ -24,6 +36,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private ImageView mLogo;
     private GridView mGridView;
+    private AlertDialog alertDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +60,159 @@ public class HomeActivity extends AppCompatActivity {
         //通过gridView显示数据
         mGridView.setAdapter(new MyGridViewAdapter());
 
+        //设置gridview的条目点击事件
+        mGridView.setOnItemClickListener(this);
+    }
+
+    /**
+      * @Author:         TimXiao
+      * @CreateDate:     2020/2/4 16:44
+      * @Description:    grid条目添加点击事件
+     * 		 *@param parent 被点击条目的父控件
+     * 		 *@param view 被点击条目的view对象
+     * 		 *@param position  被点击的条目的索引（位置）
+     * 		 *@param id  被点击的条目的id
+     */
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        switch (position){
+            case 0:
+                //判断是弹出设置密码对话框还是验证密码对话框
+                //问题：需要知道密码是否设置成功
+                //当设置密码成功，保存密码，再次点击手机防盗条目的时候，获取保存的密码，
+                //如果有保存，弹出验证密码对话框，如果没有弹出设置密码对话框
+                String sp_pwd = SharedPreferencesUtil.getString(getApplicationContext(), SJFDPWD, "");
+                if(TextUtils.isEmpty(sp_pwd)){
+                    //密码为空则弹出密码设置对话框
+                    showSetPasswordDialog();
+                }else {
+                    //Toast.makeText(getApplicationContext(), "弹出密码验证对话框", Toast.LENGTH_SHORT).show();
+                    showEnterPasswordDialog();
+                }
+                break;
+        }
+    }
+
+    private void showEnterPasswordDialog(){
+        //将布局文件home_setpassword_dialog.xml放到Dialog中显示
+        //1. 创建对话框Builder
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        //2. 将xml加载为View对象
+        View view = View.inflate(getApplicationContext(), R.layout.home_setpassword_dialog, null);
+
+
+
+
+        //初始化控件
+        final EditText mPsw = (EditText) view.findViewById(R.id.dialog_et_psw);
+        Button mOk = (Button) view.findViewById(R.id.dialog_ok);
+        Button mCancel = (Button) view.findViewById(R.id.dialog_cancel);
+
+        //设置按钮点击事件
+        mOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //1. 获取输入密码值,trim()去除空格
+                String psw = mPsw.getText().toString().trim();
+                //2. 判断密码不能为空,TextUtils会判断null和""空字符串两种情况
+                if (TextUtils.isEmpty(psw)){
+                    //假如为空则弹出吐司
+                    Toast.makeText(getApplicationContext(), "密码不能为空", Toast.LENGTH_SHORT).show();
+                    return ;
+                }
+                //3. 获取SP文件保存的密码，与录入的密码比对，如果一致则显示密码正确。
+                String confirm = SharedPreferencesUtil.getString(getApplicationContext(), SJFDPWD, "");
+                //3. 判断两次密码必须为一致
+                if(psw.equals(confirm)){
+                    Toast.makeText(getApplicationContext(), "密码正确", Toast.LENGTH_SHORT).show();
+                    alertDialog.dismiss();
+                    //跳转到手机防盗设置向导的第一个界面
+                    enterLostFind();
+                }else {
+                    Toast.makeText(getApplicationContext(), "密码错误", Toast.LENGTH_SHORT).show();
+
+                }
+
+            }
+        });
+
+        mCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //隐藏对话框
+                alertDialog.dismiss();
+            }
+        });
+
+        //3. 将一个view对象加载到对话框中
+        builder.setView(view);
+        alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    private void enterLostFind() {
+        Intent intent = new Intent(this, SetUp1Activity.class);
+        startActivity(intent);
+    }
+
+    /**
+      * @Author:         TimXiao
+      * @CreateDate:     2020/2/4 16:52
+      * @Description:    输入密码对话框
+     */
+    private void showSetPasswordDialog() {
+        //将布局文件home_setpassword_dialog.xml放到Dialog中显示
+        //1. 创建对话框Builder
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        //2. 将xml加载为View对象
+        View view = View.inflate(getApplicationContext(), R.layout.home_setpassword_dialog, null);
+
+
+        //初始化控件
+        final EditText mPsw = (EditText) view.findViewById(R.id.dialog_et_psw);
+        final EditText mConfirm = (EditText) view.findViewById(R.id.dialog_et_confirm);
+        Button mOk = (Button) view.findViewById(R.id.dialog_ok);
+        Button mCancel = (Button) view.findViewById(R.id.dialog_cancel);
+
+        //设置按钮点击事件
+        mOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //1. 获取输入密码值,trim()去除空格
+                String psw = mPsw.getText().toString().trim();
+                //2. 判断密码不能为空,TextUtils会判断null和""空字符串两种情况
+                if (TextUtils.isEmpty(psw)){
+                    //假如为空则弹出吐司
+                    Toast.makeText(getApplicationContext(), "密码不能为空", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                String confirm = mConfirm.getText().toString().trim();
+                //3. 判断两次密码必须为一致
+                if(psw.equals(confirm)){
+                    //保存设置的密码，为再次点击手机防盗条目判断做准备
+                    SharedPreferencesUtil.saveString(getApplicationContext(), SJFDPWD, psw);
+                    Toast.makeText(getApplicationContext(), "密码保存成功", Toast.LENGTH_SHORT).show();
+                    alertDialog.dismiss();
+                }else {
+                    Toast.makeText(getApplicationContext(), "两次密码不一致", Toast.LENGTH_SHORT).show();
+
+                }
+
+            }
+        });
+
+        mCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //隐藏对话框
+                alertDialog.dismiss();
+            }
+        });
+
+        //3. 将一个view对象加载到对话框中
+        builder.setView(view);
+        alertDialog = builder.create();
+        alertDialog.show();
     }
 
     /**
@@ -59,6 +225,9 @@ public class HomeActivity extends AppCompatActivity {
         Intent intent = new Intent(this, SettingActivity.class);
         startActivity(intent);
     }
+
+
+
 
     /**
   * @Author:         TimXiao

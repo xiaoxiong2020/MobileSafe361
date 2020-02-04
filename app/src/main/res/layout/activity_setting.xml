@@ -20,6 +20,7 @@
         android:background="@drawable/selector_setting_item_top"
         android:clickable="true"
         xiao:title="设置自动更新"
+        xiao:isloggle="true"
         android:layout_marginTop="12dp"
         >
     </com.xiao.mobilesafe361.view.SettingView>
@@ -28,6 +29,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/selector_setting_item_last"
         android:clickable="true"
+        xiao:isloggle="true"
         xiao:title="设置骚扰拦截">
     </com.xiao.mobilesafe361.view.SettingView>
 
@@ -37,6 +39,7 @@
         android:background="@drawable/selector_setting_item_top"
         android:clickable="true"
         android:layout_marginTop="12dp"
+        xiao:isloggle="true"
         xiao:title="归属地显示设置">
     </com.xiao.mobilesafe361.view.SettingView>
 
@@ -45,6 +48,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/selector_setting_item_last"
         android:clickable="true"
+        xiao:isloggle="false"
         xiao:title="归属地风格设置">
     </com.xiao.mobilesafe361.view.SettingView>
 
