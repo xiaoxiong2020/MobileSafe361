@@ -28,6 +28,7 @@
         />
 
     <RelativeLayout
+        android:id="@+id/setup2_rel_sim"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/selector_home_dialog_ok_bg"
@@ -44,6 +45,7 @@
             android:layout_centerVertical="true"
             />
         <ImageView
+            android:id="@+id/setup2_iv_islock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/unlock"

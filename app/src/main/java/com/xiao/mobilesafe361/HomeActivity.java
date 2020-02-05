@@ -7,7 +7,9 @@ import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.FileUtils;
+import android.telephony.SmsManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -23,6 +25,7 @@ import com.xiao.mobilesafe361.interfacre.Constants;
 import com.xiao.mobilesafe361.utils.SharedPreferencesUtil;
 
 import static com.xiao.mobilesafe361.interfacre.Constants.SJFDPWD;
+import static com.xiao.mobilesafe361.interfacre.Constants.SJFDSZWC;
 
 public class HomeActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
@@ -62,6 +65,27 @@ public class HomeActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //设置gridview的条目点击事件
         mGridView.setOnItemClickListener(this);
+
+        //TIM
+        String confirm = SharedPreferencesUtil.getString(getApplicationContext(), SJFDPWD, "");
+        Log.d("xiong", "SIM:"+confirm);
+        //sendSMSTest();
+    }
+
+    /**
+      * @Author:         TimXiao
+      * @CreateDate:     2020/2/5 17:42
+      * @Description:    发送短信功能测试
+     */
+    private void sendSMSTest() {
+        SmsManager smsManager = SmsManager.getDefault();
+        //destinationAddress : 收件人的号码
+        //scAddress : 服务中心的地址
+        //text : 发送的短信内容
+        //sentIntent : 判断是否发送成功
+        //deliveryIntent : 判断收件人是否接受成功
+        smsManager.sendTextMessage("5554", null, "test message", null, null);
+
     }
 
     /**
@@ -90,6 +114,9 @@ public class HomeActivity extends AppCompatActivity implements AdapterView.OnIte
                     showEnterPasswordDialog();
                 }
                 break;
+            case 1://骚扰拦截功能
+                Intent intent = new Intent(this, BlackNumberActivity.class);
+                startActivity(intent);
         }
     }
 
@@ -98,7 +125,7 @@ public class HomeActivity extends AppCompatActivity implements AdapterView.OnIte
         //1. 创建对话框Builder
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         //2. 将xml加载为View对象
-        View view = View.inflate(getApplicationContext(), R.layout.home_setpassword_dialog, null);
+        View view = View.inflate(getApplicationContext(), R.layout.home_enterpassword_dialog, null);
 
 
 
@@ -126,6 +153,7 @@ public class HomeActivity extends AppCompatActivity implements AdapterView.OnIte
                 if(psw.equals(confirm)){
                     Toast.makeText(getApplicationContext(), "密码正确", Toast.LENGTH_SHORT).show();
                     alertDialog.dismiss();
+
                     //跳转到手机防盗设置向导的第一个界面
                     enterLostFind();
                 }else {
@@ -151,8 +179,18 @@ public class HomeActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void enterLostFind() {
-        Intent intent = new Intent(this, SetUp1Activity.class);
-        startActivity(intent);
+        /*
+         * 根据SP中保存的是否完成向导设置标识，来决定是进入第一个向导界面还是进入，设置完成界面*/
+        boolean b = SharedPreferencesUtil.getBoolean(getApplicationContext(), SJFDSZWC, false);
+        if(b){
+            //跳转到设置完成界面
+            Intent intent = new Intent(this, LostFindActivity.class);
+            startActivity(intent);
+        }else {
+            Intent intent = new Intent(this, SetUp1Activity.class);
+            startActivity(intent);
+        }
+
     }
 
     /**

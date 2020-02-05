@@ -60,9 +60,11 @@
         android:background="#99000000" />
 
     <TextView
+        android:id="@+id/lostfind_tv_aginenter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="重新进入设置向导"
+        android:background="@drawable/selector_lostfind_enginer"
         android:textSize="18sp"
         android:padding="12dp"
         />

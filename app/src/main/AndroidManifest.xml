@@ -3,7 +3,10 @@
     package="com.xiao.mobilesafe361">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
 
     <application
         android:allowBackup="true"
@@ -12,12 +15,33 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".LostFindActivity"></activity>
+        <activity android:name=".BlackNumberActivity"></activity>
+        <activity android:name=".ContactActivity" />
+
+        <receiver
+            android:name=".BootCompleteReceiver"
+            android:enabled="true"
+            android:exported="true">
+
+            <!--
+                 intent-filter : 设置广播接受者要接受的广播事件
+                        priority ： 设置广播接受者的优先级，值越大优先级越高，越先接收到广播
+                        action : 设置接受什么样的广播
+            -->
+            <intent-filter android:priority="1000">
+
+                <!-- 手机重启的广播事件 -->
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <activity android:name=".LostFindActivity" />
         <activity android:name=".SetUp5Activity" />
         <activity android:name=".SetUp4Activity" />
         <activity android:name=".SetUp3Activity" />
         <activity android:name=".SetUp2Activity" />
         <activity android:name=".SetUp1Activity" />
+        <activity android:name=".BaseActivity" />
         <activity android:name=".SettingActivity" />
         <activity android:name=".HomeActivity" />
         <activity android:name=".SplashActivity">

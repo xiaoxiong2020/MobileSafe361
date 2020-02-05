@@ -28,6 +28,7 @@
         />
 
     <EditText
+        android:id="@+id/up3_et_safeNo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="请输入安全号码"
@@ -36,6 +37,7 @@
         />
 
     <Button
+        android:id="@+id/up3_btn_safeNo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="请选择安全号码"
