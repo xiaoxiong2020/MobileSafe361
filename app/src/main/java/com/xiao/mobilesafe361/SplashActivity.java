@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -28,6 +29,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 
 import static com.xiao.mobilesafe361.interfacre.Constants.ISPUDATE;
 
@@ -42,11 +45,15 @@ public class SplashActivity extends AppCompatActivity {
     private String mNewApkurl;
     private String mNewMsg;
     private ProgressDialog progressDialog;
+    private AssetManager assetManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
+        //拷贝号码归属地数据库,从assets目录拷贝到app的files目录
+        copyDB("address.db");
 
         //初始化界面
         initView();
@@ -70,6 +77,56 @@ public class SplashActivity extends AppCompatActivity {
             }
         }, 2000);
 
+    }
+
+    /**
+      * @Author:         TimXiao
+      * @CreateDate:     2020/2/6 19:48
+      * @Description:    拷贝号码归属地数据库
+     */
+    private void copyDB(String dbName) {
+        //判断如果数据库已经拷贝成功，不需要再次拷贝
+        File file = new File(getFilesDir(), dbName);
+        if (!file.exists()) {
+            //打开assets中保存的资源
+            //1.获取assets目录的管理者
+            assetManager = getAssets();
+            InputStream in= null;
+            FileOutputStream out = null;
+            try {
+                //2.读取数据资源
+                in = assetManager.open(dbName);
+                //getFilesDir() : data -> data -> 应用程序的包名 -> files
+                //getCacheDir() : data -> data -> 应用程序的包名 -> cache
+                out = new FileOutputStream(file);
+                //3.读写操作
+                byte[] b = new byte[1024];//缓冲区域
+                int len = -1; //保存读取的长度
+                while((len = in.read(b)) != -1){
+                    out.write(b, 0, len);
+                }
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }finally{
+                if (in != null) {
+                    try {
+                        in.close();
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+                if (out != null) {
+                    try {
+                        out.close();
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 
     private void update() {

@@ -131,14 +131,14 @@ public class BlackNumberDao {
      */
     public List<BlackNumberInfo> queryAll() {
         //模拟系统查询巨量数据的时间情况。
-        SystemClock.sleep(2000);
+        //SystemClock.sleep(2000);
 
         List<BlackNumberInfo> list = new ArrayList<BlackNumberInfo>();
 
         SQLiteDatabase database = blackNumberOpenHelper.getReadableDatabase();
         Cursor cursor = database.query(Constants.TABLE_NAME, new String[] {
                         Constants.BLACKNUMBER, Constants.MODE },
-                null, null, null, null, null);
+                null, null, null, null, "_id desc");
         while(cursor.moveToNext()){
             String blacknumber = cursor.getString(0);
             int mode = cursor.getInt(1);

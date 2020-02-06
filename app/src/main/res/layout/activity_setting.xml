@@ -25,6 +25,7 @@
         >
     </com.xiao.mobilesafe361.view.SettingView>
     <com.xiao.mobilesafe361.view.SettingView
+        android:id="@+id/setting_sv_blacknumber"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/selector_setting_item_last"

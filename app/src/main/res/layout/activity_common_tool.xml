@@ -1,0 +1,74 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:xiao="http://schemas.android.com/apk/res/com.xiao.mobilesafe361"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        style="@style/ActivityTitle"
+        android:text="常用工具"
+        />
+
+    <com.xiao.mobilesafe361.view.SettingView
+        android:id="@+id/commontool_sv_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/selector_setting_item_top"
+        android:layout_marginTop="8dp"
+        android:clickable="true"
+        xiao:title="号码归属地查询"
+        xiao:isloggle="false"
+        ></com.xiao.mobilesafe361.view.SettingView>
+
+    <com.xiao.mobilesafe361.view.SettingView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/selector_setting_item_last"
+        xiao:title="常用号码查询"
+        xiao:isloggle="false"
+        ></com.xiao.mobilesafe361.view.SettingView>
+
+    <com.xiao.mobilesafe361.view.SettingView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/selector_setting_item_top"
+        android:layout_marginTop="8dp"
+        xiao:title="短信备份"
+        xiao:isloggle="false"
+        ></com.xiao.mobilesafe361.view.SettingView>
+
+    <com.xiao.mobilesafe361.view.SettingView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/selector_setting_item_last"
+        xiao:title="短信还原"
+        xiao:isloggle="false"
+        ></com.xiao.mobilesafe361.view.SettingView>
+
+    <com.xiao.mobilesafe361.view.SettingView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/selector_setting_item_top"
+        android:layout_marginTop="8dp"
+        xiao:title="程序锁管理"
+        xiao:isloggle="false"
+        ></com.xiao.mobilesafe361.view.SettingView>
+
+    <com.xiao.mobilesafe361.view.SettingView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/selector_setting_item_middle"
+        xiao:title="开启电子狗服务1"
+        xiao:isloggle="true"
+        ></com.xiao.mobilesafe361.view.SettingView>
+
+    <com.xiao.mobilesafe361.view.SettingView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/selector_setting_item_last"
+        xiao:title="开启电子狗服务1"
+        xiao:isloggle="true"
+        ></com.xiao.mobilesafe361.view.SettingView>
+
+</LinearLayout>

@@ -1,10 +1,13 @@
 package com.xiao.mobilesafe361;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -19,11 +22,19 @@ import java.util.List;
 
 public class BlackNumberActivity extends AppCompatActivity {
 
+    //添加黑名单数据后返回数据的请求码
+    private static final int REQUEST_ADD_CODE = 100;
+    //更新黑名单数据后返回数据的请求码
+    private static final int REQUEST_UPDATE_CODE = 101;
+
+
     private LinearLayout mLLLoading;
     private ImageView mEmpty;
     private ListView mListView;
     private BlackNumberDao blackNumberDao;
     private List<BlackNumberInfo> list;
+    private MyAdapter myAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +55,20 @@ public class BlackNumberActivity extends AppCompatActivity {
         mListView = findViewById(R.id.blacknumber_lv_listview);
         mLLLoading = findViewById(R.id.bn_ll_loading);
 
+        //给list条目添加点击事件
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(BlackNumberActivity.this, BlackNumberUpdateActivity.class);
+                //设置要专递的数据
+                intent.putExtra("number", list.get(position).blacknumber);
+                intent.putExtra("mode", list.get(position).mode);
+                //需要将更新那个条目的索引告诉更新界面
+                intent.putExtra("position", position);
+                //startActivity(intent);
+                startActivityForResult(intent,REQUEST_UPDATE_CODE);
+            }
+        });
 
 
         //addData();
@@ -63,9 +88,12 @@ public class BlackNumberActivity extends AppCompatActivity {
                 list = blackNumberDao.queryAll();
                 //查询数据库完成，展示数据,由于展示数据也是一个耗时操作，开启runOnUiThread线程处理
                 runOnUiThread(new Runnable() {
+
+
                     @Override
                     public void run() {
-                        mListView.setAdapter(new MyAdapter());
+                        myAdapter = new MyAdapter();
+                        mListView.setAdapter(myAdapter);
                         //如果listview没有数据，就显示的 imageView，如果listview有数据，就隐藏imageView
                         mListView.setEmptyView(mEmpty);
                         //显示出数据就隐藏进度条
@@ -74,6 +102,55 @@ public class BlackNumberActivity extends AppCompatActivity {
                 });
             }
         }.start();
+    }
+
+    /**
+      * @Author:         TimXiao
+      * @CreateDate:     2020/2/6 11:07
+      * @Description:    enteradd按钮的点击事件
+     */
+    public void enteradd(View view) {
+        Intent intent = new Intent(this,BlackNumberAddActivity.class);
+        //startActivity(intent);
+        startActivityForResult(intent, REQUEST_ADD_CODE);
+    }
+
+    /**
+      * @Author:         TimXiao
+      * @CreateDate:     2020/2/6 11:14
+      * @Description:    跳转其他activity后，返回当前activityd会调用的方法，主要用来接收数据
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        //接受传递过来的数据
+        //因为添加界面和更新界面都会传递数据过来，需要判断数据是谁传递过来
+        //添加黑名单后返回的数据
+        if(requestCode == REQUEST_ADD_CODE){
+            if(data != null){
+                //解析传回的数据
+                String number = data.getStringExtra("number");
+                //defaultValue : 默认的值，没有传递数据过来的时候，使用的值
+                int mode = data.getIntExtra("mode", -1);
+
+                //将数据存放到bean类
+                BlackNumberInfo blackNumberInfo = new BlackNumberInfo(number, mode);
+                //将数据添加到集合哪个位置，index：位置；element：添加的数据
+                list.add(0, blackNumberInfo);
+                //更新界面，将新的数据刷新出来
+                myAdapter.notifyDataSetChanged();
+            }
+        }else if(requestCode == REQUEST_UPDATE_CODE){
+            if(data != null){
+                //解析传回的数据
+                int updatemode = data.getIntExtra("mode", -1);
+                //将更新的拦截类型设置给更新的条目，重新刷新界面
+                int position = data.getIntExtra("position", -1);
+                list.get(position).mode = updatemode;
+                //更新界面
+                myAdapter.notifyDataSetChanged();
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private class MyAdapter extends BaseAdapter {

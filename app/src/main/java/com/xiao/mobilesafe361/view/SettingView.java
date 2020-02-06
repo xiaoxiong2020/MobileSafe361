@@ -13,7 +13,7 @@ import androidx.annotation.Nullable;
 import com.xiao.mobilesafe361.R;
 
 /**
- * @Description:
+ * @Description:自定义控件对应的View
  * @Author: TimXiao
  * @CreateDate: 2020/2/3 20:10
  */
@@ -106,7 +106,7 @@ public class SettingView extends RelativeLayout {
     /**
       * @Author:         TimXiao
       * @CreateDate:     2020/2/4 11:08
-      * @Description:    根据当前开光状态来更新点击后的开关图片
+      * @Description:    更改开关状态
      */
     public void toggle() {
         /*目的：获取开关的当前状态

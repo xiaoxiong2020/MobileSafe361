@@ -68,7 +68,7 @@ public class HomeActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //TIM
         String confirm = SharedPreferencesUtil.getString(getApplicationContext(), SJFDPWD, "");
-        Log.d("xiong", "SIM:"+confirm);
+        //Log.d("xiong", "SIM:"+confirm);
         //sendSMSTest();
     }
 
@@ -117,6 +117,9 @@ public class HomeActivity extends AppCompatActivity implements AdapterView.OnIte
             case 1://骚扰拦截功能
                 Intent intent = new Intent(this, BlackNumberActivity.class);
                 startActivity(intent);
+            case 7://常用功能
+                Intent intent7 = new Intent(this, CommonToolActivity.class);
+                startActivity(intent7);
         }
     }
 
